@@ -9,7 +9,7 @@ Objetivo: MVP visual para la Feria de Innovación — el agente ejecuta el flujo
 - [x] `docs/review-plan.md` (los 7 hallazgos de la revisión)
 - [x] Commit inicial
 - [x] CP-01: verificación de conexión MCP y herramientas disponibles — smoke 25-oct-2026 17:01: servidor conectado, navegación OK, título real "React • TodoMVC" (confirma hallazgo 7), estado inicial vacío, evidencia `evidencias/CP-01_chromium_20261025-1701.png`. Nota: corrido con el servidor global de la sesión (sin flags del proyecto); la corrida formal usa el opencode.json del repo tras reiniciar OpenCode.
-- [ ] CP-02: corrida autónoma con P-01 (grabación de pantalla + evidencia por paso + tabla de veredictos)
+- [x] CP-02: corrida autónoma con P-01 (grabación de pantalla + evidencia por paso + tabla de veredictos) — APROBADO 25-oct, informe en `docs/informes/CP-02_20261025-1707.md`. Desviación registrada: servidor global sin flags + modelo de sesión Qwen3.8 Flash.
 - [ ] CP-01/CP-02 formales con config de proyecto (reiniciar OpenCode en esta carpeta)
 - [ ] Informe visual CP-02 (tabla + galería de evidencia) — insumo del pitch
 
