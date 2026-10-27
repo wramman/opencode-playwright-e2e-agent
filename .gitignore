@@ -2,3 +2,6 @@ node_modules/
 test-results/
 playwright-report/
 *.log
+
+# Test plan document is kept local only
+*.docx
