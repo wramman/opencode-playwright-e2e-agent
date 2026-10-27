@@ -39,8 +39,8 @@ export const bug = {
 export const agents: { name: string; logo?: string; logoHeight?: number; suffix?: string; onLight?: boolean }[] = [
   { name: "OpenCode", logo: "brand/opencode/opencode-wordmark-dark.svg", logoHeight: 44 },
   { name: "Claude Code", logo: "brand/anthropic/claude-code-logo-ivory.svg", logoHeight: 84 },
-  { name: "Codex", logo: "brand/openai/openai-blossom-white.svg", logoHeight: 88, suffix: "Codex" },
-  { name: "Gemini CLI", logo: "brand/google/gemini-logo.svg", logoHeight: 30, suffix: "CLI", onLight: true },
+  { name: "Codex", logo: "brand/openai/openai-blossom-white.svg", logoHeight: 110 },
+  { name: "Gemini CLI", logo: "brand/google/gemini-logo.svg", logoHeight: 34, onLight: true },
   { name: "tu agente" },
 ];
 

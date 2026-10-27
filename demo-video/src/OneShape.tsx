@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Interactive, interpolate, interpolateColors, Sequence, useCurrentFrame } from "remotion";
-import { clamp, easeBack, easeInOut, easeOut, fadeInOut, useLayout } from "./anim";
+import { clamp, easeBack, easeInOut, easeOut, useLayout } from "./anim";
 import { captions, institution, team } from "./data";
 import { AgentsScene } from "./scenes/AgentsScene";
 import { APP_STAR_AT, APP_SUMMARIZE_AT, AppScene } from "./scenes/AppScene";
@@ -10,7 +10,7 @@ import { CodeScene } from "./scenes/CodeScene";
 import { ResultsScene } from "./scenes/ResultsScene";
 import { TUI_INPUT_CLICK_AT, TuiScene } from "./scenes/TuiScene";
 import { colors, sans } from "./theme";
-import { MORPH_FRAMES, SCENES, SceneId, SHAPE_KEYS } from "./timeline";
+import { CAMERA_KEYS, CameraKey, CONTENT_OUT_LEAD, MORPH_FRAMES, Satellite, SATELLITES, SCENES, SceneId, SHAPE_KEYS } from "./timeline";
 
 // Content layers inside the shape, sized like the shape they settle into.
 // The OpenCode window spans both the prompt and the agent scenes.
@@ -26,20 +26,109 @@ const SCENE_LAYERS: { id: string; from: number; dur: number; w: number; h: numbe
 
 const CAPTION_SCENES = Object.keys(SCENES) as SceneId[];
 
-const shapeAt = (frame: number) => {
-  let i = 0;
-  while (i + 1 < SHAPE_KEYS.length && frame >= SHAPE_KEYS[i + 1].at) i++;
-  const cur = SHAPE_KEYS[i];
-  const prev = SHAPE_KEYS[Math.max(0, i - 1)];
-  const t = interpolate(frame, [cur.at, cur.at + MORPH_FRAMES], [0, 1], { ...clamp, easing: easeBack });
-  const c = interpolate(frame, [cur.at, cur.at + MORPH_FRAMES * 0.6], [0, 1], { ...clamp, easing: easeInOut });
+type ShapeState = { w: number; h: number; r: number; bg: string };
+
+const morph = (from: ShapeState, to: ShapeState, elapsed: number): ShapeState => {
+  const t = interpolate(elapsed, [0, MORPH_FRAMES], [0, 1], { ...clamp, easing: easeBack });
+  const c = interpolate(elapsed, [0, MORPH_FRAMES * 0.6], [0, 1], { ...clamp, easing: easeInOut });
   const mix = (a: number, b: number) => a + (b - a) * t;
-  return {
-    w: mix(prev.w, cur.w),
-    h: mix(prev.h, cur.h),
-    r: Math.max(0, mix(prev.r, cur.r)),
-    bg: interpolateColors(c, [0, 1], [prev.bg, cur.bg]),
-  };
+  return { w: mix(from.w, to.w), h: mix(from.h, to.h), r: Math.max(0, mix(from.r, to.r)), bg: interpolateColors(c, [0, 1], [from.bg, to.bg]) };
+};
+
+// Each morph starts from wherever the previous one was, so a key that lands
+// before the previous morph finishes never makes the shape jump.
+const shapeAt = (frame: number): ShapeState => {
+  let from: ShapeState = SHAPE_KEYS[0];
+  let to: ShapeState = SHAPE_KEYS[0];
+  let start = SHAPE_KEYS[0].at;
+  for (let k = 1; k < SHAPE_KEYS.length && frame >= SHAPE_KEYS[k].at; k++) {
+    from = morph(from, to, SHAPE_KEYS[k].at - start);
+    to = SHAPE_KEYS[k];
+    start = SHAPE_KEYS[k].at;
+  }
+  const state = morph(from, to, frame - start);
+  return { ...state, w: Math.max(0, state.w), h: Math.max(0, state.h) };
+};
+
+const cameraAt = (frame: number) => {
+  const at = CAMERA_KEYS.map((k) => k.at);
+  const value = (key: keyof Omit<CameraKey, "at">) =>
+    interpolate(frame, at, CAMERA_KEYS.map((k) => k[key]), { ...clamp, easing: easeInOut });
+  return { z: value("z"), fx: value("fx"), fy: value("fy"), rx: value("rx"), ry: value("ry"), rz: value("rz") };
+};
+
+// Wraps the shape, its satellites and the cursor; captions stay outside so
+// they never leave the safe area while the camera moves.
+const Camera = ({ cx, cy, shapeW, children }: { cx: number; cy: number; shapeW: number; children: React.ReactNode }) => {
+  const frame = useCurrentFrame();
+  const layout = useLayout();
+  const c = cameraAt(frame);
+  // Zoom around the focus point, plus a slow handheld drift.
+  let tx = c.fx * (1 - c.z) + Math.sin(frame / 38) * 6;
+  const ty = c.fy * (1 - c.z) + Math.cos(frame / 47) * 5;
+  // In the horizontal layout the captions sit left of the shape: push the
+  // stage right when a zoom would make the shape overlap them.
+  if (!layout.vertical) {
+    const minLeft = layout.caption.left + layout.caption.width + 40;
+    const left = cx + tx - (c.z * shapeW) / 2;
+    if (left < minLeft) tx += minLeft - left;
+  }
+  return (
+    <AbsoluteFill style={{ perspective: 1800, perspectiveOrigin: `${cx}px ${cy}px` }}>
+      <AbsoluteFill
+        style={{
+          transformOrigin: `${cx}px ${cy}px`,
+          transform: `translate(${tx}px, ${ty}px) rotateX(${c.rx}deg) rotateY(${c.ry}deg) rotateZ(${c.rz}deg) scale(${c.z})`,
+        }}
+      >
+        {children}
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+const SatelliteShape = ({ s, cx, cy }: { s: Satellite; cx: number; cy: number }) => {
+  const frame = useCurrentFrame();
+  const out = interpolate(frame, [s.from, s.from + 16], [0, 1], { ...clamp, easing: easeBack });
+  const back = interpolate(frame, [s.to - 12, s.to], [1, 0], { ...clamp, easing: easeInOut });
+  const t = Math.min(out, back);
+  if (t <= 0) return null;
+  const tx = s.ax * (s.sw / 2);
+  const ty = s.ay * (s.sh / 2 + s.m + s.h / 2);
+  const bob = Math.sin((frame - s.from) / 11 + s.ax * 3) * 7;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: cx + tx * t - s.w / 2,
+        top: cy + ty * t + bob * t - s.h / 2,
+        width: s.w,
+        height: s.h,
+        borderRadius: s.r,
+        background: s.bg,
+        scale: t,
+        rotate: `${(1 - t) * s.ax * 40}deg`,
+        boxShadow: "0 16px 30px -14px rgba(40, 35, 25, 0.35)",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {s.kind === "note" && (
+        <div style={{ position: "absolute", inset: 0, padding: 16, display: "flex", flexDirection: "column", gap: 9 }}>
+          <div style={{ width: 6, height: 20, borderRadius: 3, background: s.accent }} />
+          <div style={{ height: 9, borderRadius: 5, background: "#E3E6EA", width: "80%" }} />
+          <div style={{ height: 9, borderRadius: 5, background: "#E3E6EA", width: "60%" }} />
+        </div>
+      )}
+      {s.kind === "check" && (
+        <svg width={s.w * 0.5} height={s.w * 0.5} viewBox="0 0 24 24">
+          <path d="M5 12.5l4.5 4.5L19 7.5" stroke={colors.white} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </div>
+  );
 };
 
 // Cursor path relative to the shape center; `click` frames dip the cursor.
@@ -124,45 +213,53 @@ export const OneShape = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: colors.bg, fontFamily: sans }}>
-      <Interactive.Div
-        name="Shape"
-        style={{
-          position: "absolute",
-          left: layout.shapeX - shape.w / 2,
-          top: layout.shapeY - shape.h / 2,
-          width: shape.w,
-          height: shape.h,
-          borderRadius: shape.r,
-          backgroundColor: shape.bg,
-          overflow: "hidden",
-          opacity: intro,
-          scale: interpolate(intro, [0, 1], [0.7, 1]),
-          boxShadow: "0 30px 60px -20px rgba(40, 35, 25, 0.35), 0 8px 18px -8px rgba(40, 35, 25, 0.25)",
-        }}
-      >
-        {SCENE_LAYERS.map(({ id, from, dur, w, h, Component }) => (
-          <Sequence key={id} name={`Scene ${id}`} from={from} durationInFrames={dur}>
-            <SceneBox w={w} h={h} dur={dur} last={id === "close"}>
-              <Component />
-            </SceneBox>
-          </Sequence>
+      <Camera cx={layout.shapeX} cy={layout.shapeY} shapeW={shape.w}>
+        {SATELLITES.map((s, i) => (
+          <SatelliteShape key={i} s={s} cx={layout.shapeX} cy={layout.shapeY} />
         ))}
-      </Interactive.Div>
+        <Interactive.Div
+          name="Shape"
+          style={{
+            position: "absolute",
+            left: layout.shapeX - shape.w / 2,
+            top: layout.shapeY - shape.h / 2,
+            width: shape.w,
+            height: shape.h,
+            borderRadius: shape.r,
+            backgroundColor: shape.bg,
+            overflow: "hidden",
+            opacity: intro,
+            scale: interpolate(intro, [0, 1], [0.7, 1]),
+            boxShadow: "0 30px 60px -20px rgba(40, 35, 25, 0.35), 0 8px 18px -8px rgba(40, 35, 25, 0.25)",
+          }}
+        >
+          {SCENE_LAYERS.map(({ id, from, dur, w, h, Component }) => (
+            <Sequence key={id} name={`Scene ${id}`} from={from} durationInFrames={dur}>
+              <SceneBox w={w} h={h} dur={dur} last={id === "close"}>
+                <Component />
+              </SceneBox>
+            </Sequence>
+          ))}
+        </Interactive.Div>
+        <Cursor cx={layout.shapeX} cy={layout.shapeY} />
+      </Camera>
 
       {CAPTION_SCENES.map((id) => (
         <Sequence key={id} name={`Caption ${id}`} from={SCENES[id].from} durationInFrames={SCENES[id].dur}>
           <Caption id={id} />
         </Sequence>
       ))}
-
-      <Cursor cx={layout.shapeX} cy={layout.shapeY} />
     </AbsoluteFill>
   );
 };
 
 const SceneBox = ({ w, h, dur, last, children }: { w: number; h: number; dur: number; last: boolean; children: React.ReactNode }) => {
   const frame = useCurrentFrame();
-  const opacity = last ? interpolate(frame, [8, 18], [0, 1], { ...clamp, easing: easeOut }) : fadeInOut(frame, dur);
+  // Content is gone before the in-between shape state starts shrinking.
+  const fadeOutEnd = dur - CONTENT_OUT_LEAD;
+  const opacity = last
+    ? interpolate(frame, [8, 18], [0, 1], { ...clamp, easing: easeOut })
+    : interpolate(frame, [8, 18, fadeOutEnd - 8, fadeOutEnd], [0, 1, 1, 0], { ...clamp, easing: easeOut });
   return (
     <div style={{ position: "absolute", left: "50%", top: "50%", width: w, height: h, translate: "-50% -50%", opacity }}>{children}</div>
   );
