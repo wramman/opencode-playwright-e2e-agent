@@ -21,6 +21,7 @@ Branch: current (main) · Delivery: single project in `demo-video/` · Runner: `
 - T1 (S1-S5) Scaffold + scenes + both compositions — inline — done (tsc + eslint clean)
 - T2 (S2) Visual check of key frames in both formats — inline — done (8 stills per format; fixed code/prompt overflow)
 - T3 Sound effects (Higgsfield Seed Audio) — inline — done (onsets verified against cue sheet; mix peak -1.9 dB)
+- T4 Final renders (4 MP4: vertical/horizontal x con/sin audio) — inline — done (video-final/, not committed; h264 yuv420p bt709, 28.5 s)
 
 ## Log
 - L1 (2026-10-27, user): "Pues el proyecto, es mostrar el uso de la herramienta opencode, como un agente para automatizar pruebas en playwright como demo sin cerrar a otras gerramientas" → storyboard proposed; user: "aprobado".
@@ -31,3 +32,4 @@ Branch: current (main) · Delivery: single project in `demo-video/` · Runner: `
 - L6 (2026-10-27, user): "de Gemini, elimina el Cli y de Codex elimina el Codex, deja solo los logos, agrega mas shapes, y movimientos de camara atractivos" → logos only; in-between shape states (pulses/pills) between scenes; satellite shapes per scene; 3D camera rig (zoom around focus points, punches, tilts, handheld drift) that never pushes the shape into the horizontal caption column; morph now continuous when keys overlap.
 - L7 (2026-10-27, user): Codex as OpenAI Blossom + Wordmark lockup (white SVG used instead of the black PNG, which is invisible on the black shape); Fundación Universitaria Compensar logo (user PNG, 464x101, shown at native size) added to the closing caption.
 - L8 (2026-10-27, user): "solo con la pantalla va sonar con sus parlantes, entonces los efectos es la mejor opcion" → 10 SFX generated with seed_audio, trimmed, compressed and peak-normalized to -1 dB (raw files kept outside the repo); cue sheet in src/Sfx.tsx tied to the timeline. No music, no voiceover.
+- L9 (2026-10-27, user): "necesito que renderices 4 versiones, 2 verticles, 2 horitonzales, y de esas dos, una sin audio y la otra con audio" → rendered; first pass was yuvj420p (full range), re-rendered as yuv420p tv/bt709 for TV players; muted versions have no audio stream.
