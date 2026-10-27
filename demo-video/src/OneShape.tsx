@@ -9,6 +9,7 @@ import { CloseScene } from "./scenes/CloseScene";
 import { CodeScene } from "./scenes/CodeScene";
 import { ResultsScene } from "./scenes/ResultsScene";
 import { TUI_INPUT_CLICK_AT, TuiScene } from "./scenes/TuiScene";
+import { Sfx } from "./Sfx";
 import { colors, sans } from "./theme";
 import { CAMERA_KEYS, CameraKey, CONTENT_OUT_LEAD, MORPH_FRAMES, Satellite, SATELLITES, SCENES, SceneId, SHAPE_KEYS } from "./timeline";
 
@@ -224,6 +225,7 @@ export const OneShape = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: colors.bg, fontFamily: sans }}>
+      <Sfx />
       <Camera cx={layout.shapeX} cy={layout.shapeY} shapeW={shape.w}>
         {SATELLITES.map((s, i) => (
           <SatelliteShape key={i} s={s} cx={layout.shapeX} cy={layout.shapeY} />

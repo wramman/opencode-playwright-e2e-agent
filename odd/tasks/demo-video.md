@@ -20,7 +20,7 @@ Branch: current (main) · Delivery: single project in `demo-video/` · Runner: `
 ## Tasks
 - T1 (S1-S5) Scaffold + scenes + both compositions — inline — done (tsc + eslint clean)
 - T2 (S2) Visual check of key frames in both formats — inline — done (8 stills per format; fixed code/prompt overflow)
-- T3 Music / voiceover (Higgsfield) — pending, not yet requested
+- T3 Sound effects (Higgsfield Seed Audio) — inline — done (onsets verified against cue sheet; mix peak -1.9 dB)
 
 ## Log
 - L1 (2026-10-27, user): "Pues el proyecto, es mostrar el uso de la herramienta opencode, como un agente para automatizar pruebas en playwright como demo sin cerrar a otras gerramientas" → storyboard proposed; user: "aprobado".
@@ -30,3 +30,4 @@ Branch: current (main) · Delivery: single project in `demo-video/` · Runner: `
 - L5 (2026-10-27, user): "el logo openai esta en C:\Users\empaq\Downloads\openai-logos\OpenAI-logos\PNGs, y gemini "C:\Users\empaq\Downloads\Google_Gemini_logo_2025.svg"" → used the SVG versions (checked clean): OpenAI Blossom (white) + "Codex" text; Gemini logo unaltered on a white chip + "CLI". Note for user: Google asks for approval to use product icons.
 - L6 (2026-10-27, user): "de Gemini, elimina el Cli y de Codex elimina el Codex, deja solo los logos, agrega mas shapes, y movimientos de camara atractivos" → logos only; in-between shape states (pulses/pills) between scenes; satellite shapes per scene; 3D camera rig (zoom around focus points, punches, tilts, handheld drift) that never pushes the shape into the horizontal caption column; morph now continuous when keys overlap.
 - L7 (2026-10-27, user): Codex as OpenAI Blossom + Wordmark lockup (white SVG used instead of the black PNG, which is invisible on the black shape); Fundación Universitaria Compensar logo (user PNG, 464x101, shown at native size) added to the closing caption.
+- L8 (2026-10-27, user): "solo con la pantalla va sonar con sus parlantes, entonces los efectos es la mejor opcion" → 10 SFX generated with seed_audio, trimmed, compressed and peak-normalized to -1 dB (raw files kept outside the repo); cue sheet in src/Sfx.tsx tied to the timeline. No music, no voiceover.
