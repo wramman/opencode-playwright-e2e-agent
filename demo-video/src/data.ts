@@ -32,7 +32,16 @@ export const bug = {
   detail: "El contenido no se guardó en el primer intento",
 };
 
-export const agents = ["OpenCode", "Claude Code", "Codex", "Gemini CLI", "tu agente"];
+// Official logos only (OpenCode brand page, Anthropic press kit). Brands
+// without an official asset in the project are shown as plain text.
+// `logoHeight` compensates for padding built into each official SVG.
+export const agents: { name: string; logo?: string; logoHeight?: number }[] = [
+  { name: "OpenCode", logo: "brand/opencode/opencode-wordmark-dark.svg", logoHeight: 44 },
+  { name: "Claude Code", logo: "brand/anthropic/claude-code-logo-ivory.svg", logoHeight: 84 },
+  { name: "Codex" },
+  { name: "Gemini CLI" },
+  { name: "tu agente" },
+];
 
 export const title = "Pruebas E2E con agentes de IA";
 

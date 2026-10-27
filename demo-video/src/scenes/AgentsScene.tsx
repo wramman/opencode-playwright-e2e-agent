@@ -25,10 +25,13 @@ export const AgentsScene = () => {
             translate: interpolate(phase, [0, 0.4], ["0px 54px", "0px 0px"], { ...clamp, easing: easeOut }),
           }}
         >
-          {agents[index] === "OpenCode" ? (
-            <Img src={staticFile("brand/opencode/opencode-wordmark-dark.svg")} style={{ height: 44, marginTop: 8 }} />
+          {agents[index].logo ? (
+            <Img
+              src={staticFile(agents[index].logo)}
+              style={{ height: agents[index].logoHeight ?? 44, marginTop: (60 - (agents[index].logoHeight ?? 44)) / 2 }}
+            />
           ) : (
-            agents[index]
+            agents[index].name
           )}
         </div>
       </div>
