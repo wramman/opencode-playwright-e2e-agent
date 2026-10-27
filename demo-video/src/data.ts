@@ -32,14 +32,15 @@ export const bug = {
   detail: "El contenido no se guardó en el primer intento",
 };
 
-// Official logos only (OpenCode brand page, Anthropic press kit). Brands
-// without an official asset in the project are shown as plain text.
-// `logoHeight` compensates for padding built into each official SVG.
-export const agents: { name: string; logo?: string; logoHeight?: number }[] = [
+// Logos: OpenCode brand page, Anthropic press kit, OpenAI and Google files
+// supplied by the user. `logoHeight` compensates for padding built into each
+// SVG; `suffix` is text shown after the logo when the product has no own mark;
+// `onLight` puts a light-background logo on a white chip instead of recoloring it.
+export const agents: { name: string; logo?: string; logoHeight?: number; suffix?: string; onLight?: boolean }[] = [
   { name: "OpenCode", logo: "brand/opencode/opencode-wordmark-dark.svg", logoHeight: 44 },
   { name: "Claude Code", logo: "brand/anthropic/claude-code-logo-ivory.svg", logoHeight: 84 },
-  { name: "Codex" },
-  { name: "Gemini CLI" },
+  { name: "Codex", logo: "brand/openai/openai-blossom-white.svg", logoHeight: 88, suffix: "Codex" },
+  { name: "Gemini CLI", logo: "brand/google/gemini-logo.svg", logoHeight: 30, suffix: "CLI", onLight: true },
   { name: "tu agente" },
 ];
 

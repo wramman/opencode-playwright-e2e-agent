@@ -26,10 +26,18 @@ export const AgentsScene = () => {
           }}
         >
           {agents[index].logo ? (
-            <Img
-              src={staticFile(agents[index].logo)}
-              style={{ height: agents[index].logoHeight ?? 44, marginTop: (60 - (agents[index].logoHeight ?? 44)) / 2 }}
-            />
+            <div style={{ height: 60, display: "flex", alignItems: "center", gap: 14 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  ...(agents[index].onLight ? { background: colors.white, borderRadius: 26, padding: "8px 18px" } : {}),
+                }}
+              >
+                <Img src={staticFile(agents[index].logo)} style={{ height: agents[index].logoHeight ?? 44 }} />
+              </div>
+              {agents[index].suffix}
+            </div>
           ) : (
             agents[index].name
           )}
