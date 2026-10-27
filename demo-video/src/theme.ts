@@ -26,3 +26,16 @@ export const colors = {
   violet: "#8B5CF6",
   noteBlue: "#3B6A8E",
 };
+
+// OpenCode TUI colors on the demo machine (Kanagawa theme), sampled from a
+// capture of the "OpenCode Demo" window.
+export const tui = {
+  bg: "#1F1F28",
+  panel: "#2A2A37",
+  input: "#363646",
+  text: "#DCD7BA",
+  muted: "#727169",
+  accent: "#957FB8",
+  ok: "#98BB6C",
+  warn: "#FF9E3B",
+};

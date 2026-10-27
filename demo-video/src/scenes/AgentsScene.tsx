@@ -1,4 +1,4 @@
-import { interpolate, useCurrentFrame } from "remotion";
+import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { clamp, easeOut } from "../anim";
 import { agents } from "../data";
 import { colors, mono, sans } from "../theme";
@@ -25,7 +25,11 @@ export const AgentsScene = () => {
             translate: interpolate(phase, [0, 0.4], ["0px 54px", "0px 0px"], { ...clamp, easing: easeOut }),
           }}
         >
-          {agents[index]}
+          {agents[index] === "OpenCode" ? (
+            <Img src={staticFile("brand/opencode/opencode-wordmark-dark.svg")} style={{ height: 44, marginTop: 8 }} />
+          ) : (
+            agents[index]
+          )}
         </div>
       </div>
       <div style={{ fontSize: 40, color: colors.mutedOnInk }}>+</div>

@@ -3,7 +3,15 @@
 
 export const prompt = "navega y prueba la aplicación NoteAI";
 
-export const agentTools = ["browser_navigate", "browser_type", "browser_click", "browser_snapshot"];
+// Steps as OpenCode lists them while the agent runs against NotesAI.
+export const agentSteps = [
+  { tool: "skill", args: '"playwright"' },
+  { tool: "browser_navigate", args: "http://localhost:4200" },
+  { tool: "browser_click", args: '"Nueva Nota"' },
+  { tool: "browser_type", args: '"Reunión feria de innovación"' },
+  { tool: "browser_snapshot", args: "evidencias/notesai/01-creacion" },
+  { tool: "browser_click", args: '"Resumir"' },
+];
 
 export const toolCalls = 71;
 

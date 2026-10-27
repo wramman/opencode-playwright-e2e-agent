@@ -2,28 +2,29 @@ import React from "react";
 import { AbsoluteFill, Interactive, interpolate, interpolateColors, Sequence, useCurrentFrame } from "remotion";
 import { clamp, easeBack, easeInOut, easeOut, fadeInOut, useLayout } from "./anim";
 import { captions, institution, team } from "./data";
-import { AgentScene } from "./scenes/AgentScene";
 import { AgentsScene } from "./scenes/AgentsScene";
 import { APP_STAR_AT, APP_SUMMARIZE_AT, AppScene } from "./scenes/AppScene";
 import { BugScene } from "./scenes/BugScene";
 import { CloseScene } from "./scenes/CloseScene";
 import { CodeScene } from "./scenes/CodeScene";
-import { PromptScene } from "./scenes/PromptScene";
 import { ResultsScene } from "./scenes/ResultsScene";
+import { TUI_INPUT_CLICK_AT, TuiScene } from "./scenes/TuiScene";
 import { colors, sans } from "./theme";
 import { MORPH_FRAMES, SCENES, SceneId, SHAPE_KEYS } from "./timeline";
 
-// Content box per scene, sized like the shape the scene settles into.
-const SCENE_LAYERS: { id: SceneId; w: number; h: number; Component: React.FC }[] = [
-  { id: "code", w: 860, h: 190, Component: CodeScene },
-  { id: "prompt", w: 880, h: 170, Component: PromptScene },
-  { id: "agent", w: 760, h: 300, Component: AgentScene },
-  { id: "app", w: 820, h: 560, Component: AppScene },
-  { id: "bug", w: 880, h: 200, Component: BugScene },
-  { id: "results", w: 820, h: 600, Component: ResultsScene },
-  { id: "agents", w: 880, h: 200, Component: AgentsScene },
-  { id: "close", w: 860, h: 420, Component: CloseScene },
+// Content layers inside the shape, sized like the shape they settle into.
+// The OpenCode window spans both the prompt and the agent scenes.
+const SCENE_LAYERS: { id: string; from: number; dur: number; w: number; h: number; Component: React.FC }[] = [
+  { id: "code", ...SCENES.code, w: 860, h: 190, Component: CodeScene },
+  { id: "tui", from: SCENES.prompt.from, dur: SCENES.prompt.dur + SCENES.agent.dur, w: 880, h: 560, Component: TuiScene },
+  { id: "app", ...SCENES.app, w: 820, h: 560, Component: AppScene },
+  { id: "bug", ...SCENES.bug, w: 880, h: 200, Component: BugScene },
+  { id: "results", ...SCENES.results, w: 820, h: 600, Component: ResultsScene },
+  { id: "agents", ...SCENES.agents, w: 880, h: 200, Component: AgentsScene },
+  { id: "close", ...SCENES.close, w: 860, h: 420, Component: CloseScene },
 ];
+
+const CAPTION_SCENES = Object.keys(SCENES) as SceneId[];
 
 const shapeAt = (frame: number) => {
   let i = 0;
@@ -45,8 +46,8 @@ const shapeAt = (frame: number) => {
 const CURSOR_KEYS = [
   { at: SCENES.prompt.from - 4, x: 360, y: 220, o: 0 },
   { at: SCENES.prompt.from + 6, x: 360, y: 220, o: 1 },
-  { at: SCENES.prompt.from + 18, x: -230, y: 30, o: 1, click: true },
-  { at: SCENES.prompt.from + 40, x: -230, y: 30, o: 0 },
+  { at: SCENES.prompt.from + TUI_INPUT_CLICK_AT, x: -200, y: 40, o: 1, click: true },
+  { at: SCENES.prompt.from + 36, x: -200, y: 40, o: 0 },
   { at: SCENES.app.from + 80, x: 470, y: 300, o: 0 },
   { at: SCENES.app.from + 84, x: 470, y: 300, o: 1 },
   { at: SCENES.app.from + APP_STAR_AT, x: 350, y: -218, o: 1, click: true },
@@ -139,16 +140,16 @@ export const OneShape = () => {
           boxShadow: "0 30px 60px -20px rgba(40, 35, 25, 0.35), 0 8px 18px -8px rgba(40, 35, 25, 0.25)",
         }}
       >
-        {SCENE_LAYERS.map(({ id, w, h, Component }) => (
-          <Sequence key={id} name={`Scene ${id}`} from={SCENES[id].from} durationInFrames={SCENES[id].dur}>
-            <SceneBox w={w} h={h} dur={SCENES[id].dur} last={id === "close"}>
+        {SCENE_LAYERS.map(({ id, from, dur, w, h, Component }) => (
+          <Sequence key={id} name={`Scene ${id}`} from={from} durationInFrames={dur}>
+            <SceneBox w={w} h={h} dur={dur} last={id === "close"}>
               <Component />
             </SceneBox>
           </Sequence>
         ))}
       </Interactive.Div>
 
-      {SCENE_LAYERS.map(({ id }) => (
+      {CAPTION_SCENES.map((id) => (
         <Sequence key={id} name={`Caption ${id}`} from={SCENES[id].from} durationInFrames={SCENES[id].dur}>
           <Caption id={id} />
         </Sequence>

@@ -1,4 +1,4 @@
-import { colors } from "./theme";
+import { colors, tui } from "./theme";
 
 export const FPS = 30;
 
@@ -32,9 +32,8 @@ export type ShapeKey = {
 
 export const SHAPE_KEYS: ShapeKey[] = [
   { at: SCENES.code.from, w: 860, h: 190, r: 95, bg: colors.ink },
-  { at: SCENES.prompt.from, w: 880, h: 170, r: 85, bg: colors.white },
-  { at: SCENES.agent.from, w: 300, h: 300, r: 150, bg: colors.ink },
-  { at: SCENES.agent.from + 40, w: 760, h: 220, r: 110, bg: colors.ink },
+  // Prompt and agent scenes share one OpenCode window.
+  { at: SCENES.prompt.from, w: 880, h: 560, r: 28, bg: tui.bg },
   { at: SCENES.app.from, w: 820, h: 560, r: 44, bg: colors.white },
   { at: SCENES.bug.from, w: 880, h: 200, r: 100, bg: colors.ink },
   { at: SCENES.results.from, w: 820, h: 600, r: 44, bg: colors.white },
