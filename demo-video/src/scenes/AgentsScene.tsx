@@ -5,6 +5,7 @@ import { colors, mono, sans } from "../theme";
 
 const ROTATE_FROM = 14;
 const NAME_FRAMES = 14;
+const LOCKUP_OVERLAP = 40;
 
 // The same MCP base works under any agent: the agent name keeps rotating.
 export const AgentsScene = () => {
@@ -25,8 +26,8 @@ export const AgentsScene = () => {
             translate: interpolate(phase, [0, 0.4], ["0px 54px", "0px 0px"], { ...clamp, easing: easeOut }),
           }}
         >
-          {agents[index].logo ? (
-            <div style={{ height: 60, display: "flex", alignItems: "center", gap: 14 }}>
+          {agents[index].logos ? (
+            <div style={{ height: 60, display: "flex", alignItems: "center" }}>
               <div
                 style={{
                   display: "flex",
@@ -34,9 +35,11 @@ export const AgentsScene = () => {
                   ...(agents[index].onLight ? { background: colors.white, borderRadius: 26, padding: "8px 18px" } : {}),
                 }}
               >
-                <Img src={staticFile(agents[index].logo)} style={{ height: agents[index].logoHeight ?? 44 }} />
+                {agents[index].logos.map((logo, i) => (
+                  // Logos with built-in padding sit close together as one lockup.
+                  <Img key={logo.src} src={staticFile(logo.src)} style={{ height: logo.height, marginLeft: i === 0 ? 0 : -LOCKUP_OVERLAP }} />
+                ))}
               </div>
-              {agents[index].suffix}
             </div>
           ) : (
             agents[index].name

@@ -1,7 +1,7 @@
 import React from "react";
-import { AbsoluteFill, Interactive, interpolate, interpolateColors, Sequence, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, Interactive, interpolate, interpolateColors, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { clamp, easeBack, easeInOut, easeOut, useLayout } from "./anim";
-import { captions, institution, team } from "./data";
+import { captions, institution, institutionLogo, team } from "./data";
 import { AgentsScene } from "./scenes/AgentsScene";
 import { APP_STAR_AT, APP_SUMMARIZE_AT, AppScene } from "./scenes/AppScene";
 import { BugScene } from "./scenes/BugScene";
@@ -197,7 +197,16 @@ const Caption = ({ id }: { id: SceneId }) => {
         <div style={{ fontSize: 84, fontWeight: 700, lineHeight: 1.08, color: colors.ink, letterSpacing: -1.5 }}>{text}</div>
       ) : (
         <>
-          <div style={{ fontSize: 44, fontWeight: 600, color: colors.ink }}>{institution}</div>
+          <Img
+            src={staticFile(institutionLogo.src)}
+            alt={institution}
+            style={{
+              width: institutionLogo.width,
+              height: institutionLogo.height,
+              alignSelf: layout.vertical ? "center" : "flex-start",
+              marginBottom: 12,
+            }}
+          />
           <div style={{ fontSize: 34, lineHeight: 1.45, color: colors.muted }}>{team.join(" · ")}</div>
         </>
       )}

@@ -33,14 +33,22 @@ export const bug = {
 };
 
 // Logos: OpenCode brand page, Anthropic press kit, OpenAI and Google files
-// supplied by the user. `logoHeight` compensates for padding built into each
-// SVG; `suffix` is text shown after the logo when the product has no own mark;
-// `onLight` puts a light-background logo on a white chip instead of recoloring it.
-export const agents: { name: string; logo?: string; logoHeight?: number; suffix?: string; onLight?: boolean }[] = [
-  { name: "OpenCode", logo: "brand/opencode/opencode-wordmark-dark.svg", logoHeight: 44 },
-  { name: "Claude Code", logo: "brand/anthropic/claude-code-logo-ivory.svg", logoHeight: 84 },
-  { name: "Codex", logo: "brand/openai/openai-blossom-white.svg", logoHeight: 110 },
-  { name: "Gemini CLI", logo: "brand/google/gemini-logo.svg", logoHeight: 34, onLight: true },
+// supplied by the user. Each height compensates for padding built into the
+// SVG; `onLight` puts a light-background logo on a white chip instead of
+// recoloring it.
+export type AgentLogo = { src: string; height: number };
+
+export const agents: { name: string; logos?: AgentLogo[]; onLight?: boolean }[] = [
+  { name: "OpenCode", logos: [{ src: "brand/opencode/opencode-wordmark-dark.svg", height: 44 }] },
+  { name: "Claude Code", logos: [{ src: "brand/anthropic/claude-code-logo-ivory.svg", height: 84 }] },
+  {
+    name: "Codex",
+    logos: [
+      { src: "brand/openai/openai-blossom-white.svg", height: 110 },
+      { src: "brand/openai/openai-wordmark-white.svg", height: 120 },
+    ],
+  },
+  { name: "Gemini CLI", logos: [{ src: "brand/google/gemini-logo.svg", height: 34 }], onLight: true },
   { name: "tu agente" },
 ];
 
@@ -57,6 +65,9 @@ export const team = [
 ];
 
 export const institution = "Fundación Universitaria Compensar";
+
+// Supplied by the user; 464x101 raster, never shown larger than native size.
+export const institutionLogo = { src: "brand/ucompensar/ucompensar-logo.png", width: 464, height: 101 };
 
 export const captions = {
   code: "Los scripts de prueba se rompen con cada cambio.",
