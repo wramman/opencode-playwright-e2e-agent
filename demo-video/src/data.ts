@@ -48,7 +48,7 @@ export const agents: { name: string; logos?: AgentLogo[]; onLight?: boolean }[] 
       { src: "brand/openai/openai-wordmark-white.svg", height: 120 },
     ],
   },
-  { name: "Gemini CLI", logos: [{ src: "brand/google/gemini-logo.svg", height: 34 }], onLight: true },
+  { name: "Gemini CLI", logos: [{ src: "brand/google/gemini-logo.svg", height: 54 }], onLight: true },
   { name: "tu agente" },
 ];
 

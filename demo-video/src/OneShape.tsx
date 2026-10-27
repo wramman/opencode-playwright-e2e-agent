@@ -205,6 +205,8 @@ const Caption = ({ id }: { id: SceneId }) => {
               height: institutionLogo.height,
               alignSelf: layout.vertical ? "center" : "flex-start",
               marginBottom: 12,
+              scale: 1.64,
+              translate: "0px -79.9px"
             }}
           />
           <div style={{ fontSize: 34, lineHeight: 1.45, color: colors.muted }}>{team.join(" · ")}</div>

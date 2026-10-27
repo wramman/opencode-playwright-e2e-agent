@@ -6,6 +6,8 @@ import { colors, mono, sans } from "../theme";
 const ROTATE_FROM = 14;
 const NAME_FRAMES = 14;
 const LOCKUP_OVERLAP = 40;
+// Tall enough for the largest logo chip; transparent SVG padding may be clipped.
+const ROW_HEIGHT = 96;
 
 // The same MCP base works under any agent: the agent name keeps rotating.
 export const AgentsScene = () => {
@@ -16,23 +18,23 @@ export const AgentsScene = () => {
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 48px", gap: 24, fontFamily: sans }}>
-      <div style={{ height: 60, overflow: "hidden", flex: 1, display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ height: ROW_HEIGHT, overflow: "hidden", flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
         <div
           style={{
             fontSize: 44,
             fontWeight: 600,
             color: isLast ? colors.green : colors.white,
             whiteSpace: "nowrap",
-            translate: interpolate(phase, [0, 0.4], ["0px 54px", "0px 0px"], { ...clamp, easing: easeOut }),
+            translate: interpolate(phase, [0, 0.4], [`0px ${ROW_HEIGHT}px`, "0px 0px"], { ...clamp, easing: easeOut }),
           }}
         >
           {agents[index].logos ? (
-            <div style={{ height: 60, display: "flex", alignItems: "center" }}>
+            <div style={{ height: ROW_HEIGHT, display: "flex", alignItems: "center" }}>
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  ...(agents[index].onLight ? { background: colors.white, borderRadius: 26, padding: "8px 18px" } : {}),
+                  ...(agents[index].onLight ? { background: colors.white, borderRadius: 40, padding: "12px 28px" } : {}),
                 }}
               >
                 {agents[index].logos.map((logo, i) => (
